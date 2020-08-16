@@ -1,5 +1,5 @@
 from utils_pos import get_word_tag, preprocess  
-from formulas import create_dictionaries, predict_pos, create_transition_matrix, create_emission_matrix
+from formulas import create_dictionaries, predict_pos, create_transition_matrix, create_emission_matrix, initialize
 import pandas as pd
 from collections import defaultdict
 import math
@@ -112,3 +112,9 @@ rows = [states.index(a) for a in rvals]
 # Get the emissions for the sample of words, and the sample of POS tags
 B_sub = pd.DataFrame(B[np.ix_(rows,cols)], index=rvals, columns = cidx )
 print(B_sub)
+
+best_probs, best_paths = initialize(states, tag_counts, A, B, prep, vocab)
+
+# Test the function
+print(f"best_probs[0,0]: {best_probs[0,0]:.4f}") 
+print(f"best_paths[2,3]: {best_paths[2,3]:.4f}")
