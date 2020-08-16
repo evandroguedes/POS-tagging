@@ -1,5 +1,5 @@
 from utils_pos import get_word_tag, preprocess  
-from formulas import create_dictionaries, predict_pos, create_transition_matrix
+from formulas import create_dictionaries, predict_pos, create_transition_matrix, create_emission_matrix
 import pandas as pd
 from collections import defaultdict
 import math
@@ -90,3 +90,25 @@ print(f"A at row 3, col 1: {A[3,1]:.4f}")
 print("View a subset of transition matrix A")
 A_sub = pd.DataFrame(A[30:35,30:35], index=states[30:35], columns = states[30:35] )
 print(A_sub)
+
+# creating your emission probability matrix. this takes a few minutes to run. 
+B = create_emission_matrix(alpha, tag_counts, emission_counts, list(vocab))
+
+print(f"View Matrix position at row 0, column 0: {B[0,0]:.9f}")
+print(f"View Matrix position at row 3, column 1: {B[3,1]:.9f}")
+
+# Try viewing emissions for a few words in a sample dataframe
+cidx  = ['725','adroitly','engineers', 'promoted', 'synergy']
+
+# Get the integer ID for each word
+cols = [vocab[a] for a in cidx]
+
+# Choose POS tags to show in a sample dataframe
+rvals =['CD','NN','NNS', 'VB','RB','RP']
+
+# For each POS tag, get the row number from the 'states' list
+rows = [states.index(a) for a in rvals]
+
+# Get the emissions for the sample of words, and the sample of POS tags
+B_sub = pd.DataFrame(B[np.ix_(rows,cols)], index=rvals, columns = cidx )
+print(B_sub)
