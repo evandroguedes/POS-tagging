@@ -1,5 +1,5 @@
 from utils_pos import get_word_tag, preprocess  
-from formulas import create_dictionaries, predict_pos
+from formulas import create_dictionaries, predict_pos, create_transition_matrix
 import pandas as pd
 from collections import defaultdict
 import math
@@ -80,3 +80,13 @@ for tup,cnt in emission_counts.items():
 
 accuracy_predict_pos = predict_pos(prep, y, emission_counts, vocab, states)
 print(f"Accuracy of prediction using predict_pos is {accuracy_predict_pos:.4f}")
+
+alpha = 0.001
+A = create_transition_matrix(alpha, tag_counts, transition_counts)
+# Testing your function
+print(f"A at row 0, col 0: {A[0,0]:.9f}")
+print(f"A at row 3, col 1: {A[3,1]:.4f}")
+
+print("View a subset of transition matrix A")
+A_sub = pd.DataFrame(A[30:35,30:35], index=states[30:35], columns = states[30:35] )
+print(A_sub)

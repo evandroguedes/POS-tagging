@@ -1,5 +1,7 @@
 from collections import defaultdict
 from utils_pos import get_word_tag
+import math
+import numpy as np
 
 def create_dictionaries(training_corpus, vocab):
     """
@@ -47,7 +49,7 @@ def create_dictionaries(training_corpus, vocab):
         tag_counts[tag] += 1
 
         # Set the previous tag to this tag (for the next iteration of the loop)
-        prev_tag = 1
+        prev_tag = tag
         
     return emission_counts, transition_counts, tag_counts
 
@@ -120,3 +122,54 @@ def predict_pos(prep, y, emission_counts, vocab, states):
     accuracy = num_correct / total
     
     return accuracy
+
+    # UNQ_C3 (UNIQUE CELL IDENTIFIER, DO NOT EDIT)
+
+def create_transition_matrix(alpha, tag_counts, transition_counts):
+    ''' 
+    Input: 
+        alpha: number used for smoothing
+        tag_counts: a dictionary mapping each tag to its respective count
+        transition_counts: transition count for the previous word and tag
+    Output:
+        A: matrix of dimension (num_tags,num_tags)
+    '''
+    # Get a sorted list of unique POS tags
+    all_tags = sorted(tag_counts.keys())
+    
+    # Count the number of unique POS tags
+    num_tags = len(all_tags)
+    
+    # Initialize the transition matrix 'A'
+    A = np.zeros((num_tags,num_tags))
+    
+    # Get the unique transition tuples (previous POS, current POS)
+    trans_keys = set(transition_counts.keys())
+
+    print(transition_counts)
+    
+    # Go through each row of the transition matrix A
+    for i in range(num_tags):
+        # Go through each column of the transition matrix A
+        for j in range(num_tags):
+
+            # Initialize the count of the (prev POS, current POS) to zero
+            count = 0
+        
+            # Define the tuple (prev POS, current POS)
+            # Get the tag at position i and tag at position j (from the all_tags list)
+            key = (all_tags[i], all_tags[j])
+            # Check if the (prev POS, current POS) tuple 
+            # exists in the transition counts dictionary
+            if key in trans_keys:
+                # Get count from the transition_counts dictionary 
+                # for the (prev POS, current POS) tuple
+                count = transition_counts[key]
+
+            # Get the count of the previous tag (index position i) from tag_counts
+            count_prev_tag = tag_counts[all_tags[i]]
+            # Apply smoothing using count of the tuple, alpha, 
+            # count of previous tag, alpha, and total number of tags
+            A[i,j] =  (count + alpha) / (count_prev_tag + alpha * num_tags)
+    
+    return A
