@@ -1,5 +1,5 @@
 from utils_pos import get_word_tag, preprocess  
-from formulas import create_dictionaries, predict_pos, create_transition_matrix, create_emission_matrix, initialize
+from formulas import create_dictionaries, predict_pos, create_transition_matrix, create_emission_matrix, initialize, viterbi_forward, viterbi_backward
 import pandas as pd
 from collections import defaultdict
 import math
@@ -118,3 +118,18 @@ best_probs, best_paths = initialize(states, tag_counts, A, B, prep, vocab)
 # Test the function
 print(f"best_probs[0,0]: {best_probs[0,0]:.4f}") 
 print(f"best_paths[2,3]: {best_paths[2,3]:.4f}")
+
+# this will take a few minutes to run => processes ~ 30,000 words
+best_probs, best_paths = viterbi_forward(A, B, prep, best_probs, best_paths, vocab)
+
+# Test this function 
+print(f"best_probs[0,1]: {best_probs[0,1]:.4f}") 
+print(f"best_probs[0,4]: {best_probs[0,4]:.4f}") 
+
+# Run and test your function
+pred = viterbi_backward(best_probs, best_paths, prep, states)
+m=len(pred)
+print('The prediction for pred[-7:m-1] is: \n', prep[-7:m-1], "\n", pred[-7:m-1], "\n")
+print('The prediction for pred[0:8] is: \n', pred[0:7], "\n", prep[0:7])
+
+print(f"Accuracy of the Viterbi algorithm is {compute_accuracy(pred, y):.4f}")
